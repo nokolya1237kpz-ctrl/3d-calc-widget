@@ -1,6 +1,10 @@
 // Инициализация VK Bridge (замените YOUR_APP_ID на реальный ID вашего приложения VK)
 VK.init({ apiId: 54559933 });
-VKWebAppInit().catch(e => console.error('Ошибка инициализации VK:', e));
+VKWebAppInit().then(() => {
+    console.log('✅ Приложение инициализировано');
+}).catch(e => {
+    console.error('❌ Ошибка инициализации VK:', e);
+});
 
 // ---------- Константы ----------
 const MATERIAL_PRICES = {
