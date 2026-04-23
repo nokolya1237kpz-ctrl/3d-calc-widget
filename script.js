@@ -25,7 +25,7 @@ const STORAGE_KEYS = [
 ];
 
 // URL вашего бэкенда (сервер с Flask)
-const API_BASE_URL = 'https://ваш-сервер.домен'; // ЗАМЕНИТЕ НА РЕАЛЬНЫЙ АДРЕС
+const API_BASE_URL = 'http://194.87.201.19:5001'; // ЗАМЕНИТЕ НА РЕАЛЬНЫЙ АДРЕС
 
 // ---------- Работа с VK Storage ----------
 async function loadSettings() {
