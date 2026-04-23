@@ -42,7 +42,7 @@ const STORAGE_KEYS = [
 // ✅ URL бэкенда — используйте HTTPS или относительный путь
 // Для GitHub Pages: если бэкенд на том же домене, используйте относительный путь
 // Если на отдельном сервере — обязательно HTTPS!
-const API_BASE_URL = 'https://194.87.201.19:5001'; // 🔒 Замените на HTTPS после настройки SSL
+const API_BASE_URL = 'https://3dcalk.freedynamicdns.net:8443' // 🔒 Замените на HTTPS после настройки SSL
 
 // ---------- Работа с VK Storage через vkBridge ----------
 async function loadSettings() {
