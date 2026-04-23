@@ -3,168 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <link rel="stylesheet" href="style.css">
     <title>3D Калькулятор печати</title>
     <script src="https://vk.com/js/api/openapi.js?169"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            background: #edeef0;
-            margin: 0;
-            padding: 12px;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-        }
-        label {
-            font-weight: 600;
-            display: block;
-            margin-top: 12px;
-            margin-bottom: 4px;
-            font-size: 14px;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d0d3d6;
-            border-radius: 10px;
-            font-size: 16px;
-            background: white;
-        }
-        button {
-            background: #4a76a8;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 500;
-            margin-top: 16px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        button:active { opacity: 0.7; }
-        .result {
-            background: #e8f0fe;
-            padding: 16px;
-            border-radius: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            white-space: pre-wrap;
-            margin-top: 16px;
-        }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            background: #e1e3e6;
-            border-radius: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.1s;
-        }
-        .tab.active {
-            background: #4a76a8;
-            color: white;
-        }
-        .hidden { display: none; }
-        .inline-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .inline-buttons button {
-            margin-top: 0;
-            flex: 1;
-        }
-        hr { margin: 16px 0; }
-        small { color: #6c757d; font-size: 12px; }
-        .upload-status {
-            font-size: 12px;
-            margin-top: 5px;
-            color: gray;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="tabs">
-        <div class="tab active" data-tab="calc">📊 Расчёт</div>
-        <div class="tab" data-tab="settings">⚙️ Настройки</div>
-    </div>
-
-    <!-- Вкладка Расчёта -->
-    <div id="calc-tab">
-        <div class="card">
-            <label>⚖️ Вес модели (граммы)</label>
-            <input type="number" id="weight" placeholder="например 50" step="1" value="50">
-            
-            <div class="inline-buttons" style="margin-top: 12px;">
-                <button id="upload-stl-btn">📁 Загрузить STL</button>
-                <input type="file" id="stl-file-input" accept=".stl" style="display: none;">
-            </div>
-            <div id="upload-status" class="upload-status"></div>
-            
-            <label>🧪 Материал</label>
-            <select id="material">
-                <option value="PLA">PLA (1200 ₽/кг)</option>
-                <option value="ABS">ABS (1500 ₽/кг)</option>
-                <option value="PETG">PETG (1100 ₽/кг)</option>
-                <option value="TPU">TPU (2200 ₽/кг)</option>
-                <option value="Nylon">Нейлон (3000 ₽/кг)</option>
-            </select>
-            
-            <label>⏱️ Время печати (часы)</label>
-            <input type="number" id="time" placeholder="например 2.5" step="0.5" value="2">
-            
-            <label>🔧 Сложность модели</label>
-            <select id="complexity">
-                <option value="low">Простая (без поддержек) ×1.0</option>
-                <option value="medium" selected>Средняя (с поддержками) ×1.3</option>
-                <option value="high">Сложная (техническая) ×1.7</option>
-            </select>
-            
-            <label>📈 Наценка (%)</label>
-            <input type="number" id="markup" placeholder="например 30" value="30" step="5">
-            
-            <button id="calc-btn">🧮 Рассчитать стоимость</button>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="calc">📊 Расчёт</button>
+            <button class="tab" data-tab="settings">⚙️ Настройки</button>
         </div>
-        <div id="result" class="result hidden"></div>
-    </div>
 
-    <!-- Вкладка Настроек -->
-    <div id="settings-tab" class="hidden">
-        <div class="card">
-            <label>⚡ Стоимость электроэнергии (₽/кВт·ч)</label>
-            <input type="number" id="electricity_cost" step="0.01" value="5.85">
-            
-            <label>🔌 Мощность принтера (Вт)</label>
-            <input type="number" id="printer_power" step="10" value="200">
-            
-            <label>💰 Стоимость принтера (₽)</label>
-            <input type="number" id="printer_cost" step="1000" value="80000">
-            
-            <label>📅 Срок службы принтера (месяцы)</label>
-            <input type="number" id="printer_lifetime" step="1" value="48">
-            
-            <label>🕒 Ставка печати (₽/час)</label>
-            <input type="number" id="printing_rate" step="0.5" value="2">
-            
-            <div class="inline-buttons">
-                <button id="save-settings">💾 Сохранить</button>
-                <button id="reset-settings">🔄 Сброс</button>
+        <div id="calc-tab" class="tab-content active">
+            <div class="card">
+                <label>⚖️ Вес модели (граммы)</label>
+                <input type="number" id="weight" placeholder="например 50" step="1" value="50">
+                
+                <div class="file-upload">
+                    <button id="upload-stl-btn" class="secondary">📁 Загрузить STL</button>
+                    <input type="file" id="stl-file-input" accept=".stl" style="display: none;">
+                    <div id="upload-status" class="status"></div>
+                </div>
+                
+                <label>🧪 Материал</label>
+                <select id="material">
+                    <option value="PLA">PLA (1200 ₽/кг, плотность 1.24)</option>
+                    <option value="ABS">ABS (1500 ₽/кг, плотность 1.04)</option>
+                    <option value="PETG">PETG (1100 ₽/кг, плотность 1.27)</option>
+                    <option value="TPU">TPU (2200 ₽/кг, плотность 1.21)</option>
+                    <option value="Нейлон">Нейлон (3000 ₽/кг, плотность 1.14)</option>
+                </select>
+                
+                <label>⏱️ Время печати (часы)</label>
+                <input type="number" id="time" placeholder="например 2.5" step="0.5" value="2">
+                
+                <label>🔧 Сложность модели</label>
+                <select id="complexity">
+                    <option value="1.0">Простая (без поддержек) ×1.0</option>
+                    <option value="1.3" selected>Средняя (с поддержками) ×1.3</option>
+                    <option value="1.7">Сложная (техническая) ×1.7</option>
+                </select>
+                
+                <label>📈 Наценка (%)</label>
+                <input type="number" id="markup" placeholder="например 30" value="30" step="5">
+                
+                <button id="calc-btn" class="primary">🧮 Рассчитать стоимость</button>
             </div>
-            <small>Настройки сохраняются в VK Storage и действуют только для этого приложения</small>
+            <div id="result" class="result hidden"></div>
+        </div>
+
+        <div id="settings-tab" class="tab-content">
+            <div class="card">
+                <label>⚡ Стоимость электроэнергии (₽/кВт·ч)</label>
+                <input type="number" id="electricity_cost" step="0.01" value="5.85">
+                
+                <label>🔌 Мощность принтера (Вт)</label>
+                <input type="number" id="printer_power" step="10" value="200">
+                
+                <label>💰 Стоимость принтера (₽)</label>
+                <input type="number" id="printer_cost" step="1000" value="80000">
+                
+                <label>📅 Срок службы принтера (месяцы)</label>
+                <input type="number" id="printer_lifetime" step="1" value="48">
+                
+                <label>🕒 Ставка печати (₽/час)</label>
+                <input type="number" id="printing_rate" step="0.5" value="2">
+                
+                <div class="button-group">
+                    <button id="save-settings" class="primary">💾 Сохранить</button>
+                    <button id="reset-settings" class="secondary">🔄 Сброс</button>
+                </div>
+                <small>Настройки сохраняются в браузере</small>
+            </div>
         </div>
     </div>
 
