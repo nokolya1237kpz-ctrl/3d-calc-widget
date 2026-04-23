@@ -1,5 +1,5 @@
 // Инициализация VK Bridge (замените YOUR_APP_ID на реальный ID вашего приложения VK)
-VK.init({ apiId: YOUR_APP_ID });
+VK.init({ apiId: 54559933 });
 
 // ---------- Константы ----------
 const MATERIAL_PRICES = {
