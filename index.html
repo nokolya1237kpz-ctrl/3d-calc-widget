@@ -1,192 +1,173 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-    span.s2 {font: 12.0px 'Apple Color Emoji'; font-kerning: none}
-    span.s3 {font: 12.0px 'STIX Two Math'; font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+    <title>3D Калькулятор печати</title>
+    <script src="https://vk.com/js/api/openapi.js?169"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #edeef0;
+            margin: 0;
+            padding: 12px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d0d3d6;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+        }
+        button {
+            background: #4a76a8;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:active { opacity: 0.7; }
+        .result {
+            background: #e8f0fe;
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            margin-top: 16px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: #e1e3e6;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .tab.active {
+            background: #4a76a8;
+            color: white;
+        }
+        .hidden { display: none; }
+        .inline-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .inline-buttons button {
+            margin-top: 0;
+            flex: 1;
+        }
+        hr { margin: 16px 0; }
+        small { color: #6c757d; font-size: 12px; }
+        .upload-status {
+            font-size: 12px;
+            margin-top: 5px;
+            color: gray;
+        }
+    </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="ru"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="style.css"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;3D Калькулятор печати&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://vk.com/js/api/openapi.js?169"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>* { box-sizing: border-box; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #edeef0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.card {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-bottom: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: 0 1px 2px rgba(0,0,0,0.08);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>label {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: 600;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: block;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-bottom: 4px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 14px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>input, select {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: 1px solid #d0d3d6;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>button {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #4a76a8;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: none;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: 500;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transition: opacity 0.2s;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>button:active { opacity: 0.7; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.result {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #e8f0fe;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: 'Courier New', monospace;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 14px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>white-space: pre-wrap;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.tabs {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gap: 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-bottom: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.tab {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex: 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #e1e3e6;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: 500;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transition: 0.1s;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.tab.active {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #4a76a8;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.hidden { display: none; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.inline-buttons {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gap: 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.inline-buttons button {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex: 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>hr { margin: 16px 0; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>small { color: #6c757d; font-size: 12px; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.upload-status {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 5px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: gray;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="tabs"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="tab active" data-tab="calc"&gt;</span><span class="s2">📊</span><span class="s1"> Расчёт&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="tab" data-tab="settings"&gt;</span><span class="s2">⚙️</span><span class="s1"> Настройки&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- Вкладка Расчёта --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="calc-tab"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">⚖️</span><span class="s1"> Вес модели (граммы)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="weight" placeholder="например 50" step="1" value="50"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="inline-buttons" style="margin-top: 12px;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="upload-stl-btn"&gt;</span><span class="s2">📁</span><span class="s1"> Загрузить STL&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;input type="file" id="stl-file-input" accept=".stl" style="display: none;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="upload-status" class="upload-status"&gt;&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">🧪</span><span class="s1"> Материал&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="material"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="PLA"&gt;PLA (1200 </span><span class="s3">₽</span><span class="s1">/кг)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="ABS"&gt;ABS (1500 </span><span class="s3">₽</span><span class="s1">/кг)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="PETG"&gt;PETG (1100 </span><span class="s3">₽</span><span class="s1">/кг)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="TPU"&gt;TPU (2200 </span><span class="s3">₽</span><span class="s1">/кг)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="Nylon"&gt;Нейлон (3000 </span><span class="s3">₽</span><span class="s1">/кг)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/select&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">⏱️</span><span class="s1"> Время печати (часы)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="time" placeholder="например 2.5" step="0.5" value="2"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">🔧</span><span class="s1"> Сложность модели&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="complexity"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="low"&gt;Простая (без поддержек) ×1.0&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="medium" selected&gt;Средняя (с поддержками) ×1.3&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="high"&gt;Сложная (техническая) ×1.7&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/select&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">📈</span><span class="s1"> Наценка (%)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="markup" placeholder="например 30" value="30" step="5"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="calc-btn"&gt;</span><span class="s2">🧮</span><span class="s1"> Рассчитать стоимость&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="result" class="result hidden"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- Вкладка Настроек --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="settings-tab" class="hidden"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">⚡</span><span class="s1"> Стоимость электроэнергии (</span><span class="s3">₽</span><span class="s1">/кВт·ч)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="electricity_cost" step="0.01" value="5.85"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">🔌</span><span class="s1"> Мощность принтера (Вт)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="printer_power" step="10" value="200"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">💰</span><span class="s1"> Стоимость принтера (</span><span class="s3">₽</span><span class="s1">)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="printer_cost" step="1000" value="80000"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">📅</span><span class="s1"> Срок службы принтера (месяцы)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="printer_lifetime" step="1" value="48"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;label&gt;</span><span class="s2">🕒</span><span class="s1"> Ставка печати (</span><span class="s3">₽</span><span class="s1">/час)&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="printing_rate" step="0.5" value="2"&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="inline-buttons"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="save-settings"&gt;</span><span class="s2">💾</span><span class="s1"> Сохранить&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="reset-settings"&gt;</span><span class="s2">🔄</span><span class="s1"> Сброс&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;small&gt;Настройки сохраняются в VK Storage и действуют только для этого приложения&lt;/small&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="script.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+    <div class="tabs">
+        <div class="tab active" data-tab="calc">📊 Расчёт</div>
+        <div class="tab" data-tab="settings">⚙️ Настройки</div>
+    </div>
+
+    <!-- Вкладка Расчёта -->
+    <div id="calc-tab">
+        <div class="card">
+            <label>⚖️ Вес модели (граммы)</label>
+            <input type="number" id="weight" placeholder="например 50" step="1" value="50">
+            
+            <div class="inline-buttons" style="margin-top: 12px;">
+                <button id="upload-stl-btn">📁 Загрузить STL</button>
+                <input type="file" id="stl-file-input" accept=".stl" style="display: none;">
+            </div>
+            <div id="upload-status" class="upload-status"></div>
+            
+            <label>🧪 Материал</label>
+            <select id="material">
+                <option value="PLA">PLA (1200 ₽/кг)</option>
+                <option value="ABS">ABS (1500 ₽/кг)</option>
+                <option value="PETG">PETG (1100 ₽/кг)</option>
+                <option value="TPU">TPU (2200 ₽/кг)</option>
+                <option value="Nylon">Нейлон (3000 ₽/кг)</option>
+            </select>
+            
+            <label>⏱️ Время печати (часы)</label>
+            <input type="number" id="time" placeholder="например 2.5" step="0.5" value="2">
+            
+            <label>🔧 Сложность модели</label>
+            <select id="complexity">
+                <option value="low">Простая (без поддержек) ×1.0</option>
+                <option value="medium" selected>Средняя (с поддержками) ×1.3</option>
+                <option value="high">Сложная (техническая) ×1.7</option>
+            </select>
+            
+            <label>📈 Наценка (%)</label>
+            <input type="number" id="markup" placeholder="например 30" value="30" step="5">
+            
+            <button id="calc-btn">🧮 Рассчитать стоимость</button>
+        </div>
+        <div id="result" class="result hidden"></div>
+    </div>
+
+    <!-- Вкладка Настроек -->
+    <div id="settings-tab" class="hidden">
+        <div class="card">
+            <label>⚡ Стоимость электроэнергии (₽/кВт·ч)</label>
+            <input type="number" id="electricity_cost" step="0.01" value="5.85">
+            
+            <label>🔌 Мощность принтера (Вт)</label>
+            <input type="number" id="printer_power" step="10" value="200">
+            
+            <label>💰 Стоимость принтера (₽)</label>
+            <input type="number" id="printer_cost" step="1000" value="80000">
+            
+            <label>📅 Срок службы принтера (месяцы)</label>
+            <input type="number" id="printer_lifetime" step="1" value="48">
+            
+            <label>🕒 Ставка печати (₽/час)</label>
+            <input type="number" id="printing_rate" step="0.5" value="2">
+            
+            <div class="inline-buttons">
+                <button id="save-settings">💾 Сохранить</button>
+                <button id="reset-settings">🔄 Сброс</button>
+            </div>
+            <small>Настройки сохраняются в VK Storage и действуют только для этого приложения</small>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
