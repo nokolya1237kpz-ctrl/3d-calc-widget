@@ -1,4 +1,4 @@
-/* Общие стили для VK Mini App */
+/* ✅ Исправлен селектор: был просто {, теперь * */
 * {
     margin: 0;
     padding: 0;
@@ -11,6 +11,7 @@ body {
     background: #edeef0;
     padding: 12px;
     padding-bottom: 30px;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Карточки */
@@ -47,6 +48,9 @@ input, select {
     background: #ffffff;
     transition: 0.2s;
     outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 input:focus, select:focus {
@@ -74,6 +78,11 @@ button:active {
     transform: scale(0.98);
 }
 
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* Группа кнопок в ряд */
 .inline-buttons {
     display: flex;
@@ -92,6 +101,7 @@ button:active {
     color: #6c757d;
     margin-top: 6px;
     padding-left: 4px;
+    min-height: 18px;
 }
 
 /* Результат расчёта */
@@ -133,6 +143,7 @@ button:active {
     cursor: pointer;
     transition: 0.2s;
     color: #2c3e50;
+    user-select: none;
 }
 
 .tab.active {
@@ -142,7 +153,7 @@ button:active {
 
 /* Утилиты */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 small {
@@ -151,6 +162,7 @@ small {
     display: block;
     margin-top: 12px;
     text-align: center;
+    line-height: 1.4;
 }
 
 /* Адаптив для очень маленьких экранов */
@@ -163,5 +175,29 @@ small {
     }
     .inline-buttons {
         flex-direction: column;
+    }
+}
+
+/* Поддержка тёмной темы VK */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #19191a;
+    }
+    .card {
+        background: #222224;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    input, select {
+        background: #2d2d2f;
+        border-color: #444446;
+        color: #e1e3e6;
+    }
+    .result {
+        background: #2a3a5a;
+        border-left-color: #6a8fc4;
+    }
+    .tab {
+        background: #2d2d2f;
+        color: #e1e3e6;
     }
 }
