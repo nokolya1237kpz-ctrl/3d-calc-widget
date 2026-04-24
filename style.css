@@ -9,6 +9,7 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background: #edeef0;
+    color: #1a1a1a;  /* ✅ Более тёмный цвет текста для всего body */
     padding: 12px;
     padding-bottom: 30px;
 }
@@ -28,7 +29,7 @@ label {
     display: block;
     margin-top: 14px;
     margin-bottom: 6px;
-    color: #2c3e50;
+    color: #1a1a1a;  /* ✅ Более контрастный цвет */
 }
 
 label:first-of-type {
@@ -43,6 +44,7 @@ input {
     border-radius: 12px;
     font-size: 16px;
     background: #ffffff;
+    color: #1a1a1a;  /* ✅ Явный цвет текста в полях */
     transition: 0.2s;
     outline: none;
 }
@@ -55,6 +57,7 @@ select {
     border-radius: 12px;
     font-size: 16px;
     background: #ffffff;
+    color: #1a1a1a;  /* ✅ Явный цвет текста */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
@@ -104,30 +107,33 @@ button:active {
 
 .upload-status {
     font-size: 12px;
-    color: #6c757d;
+    color: #555555;  /* ✅ Чуть темнее для читаемости */
     margin-top: 6px;
     padding-left: 4px;
 }
 
+/* ✅ ✅ ✅ ИСПРАВЛЕНО: Блок результатов — высокая контрастность */
 .result {
-    background: #e8f0fe;
+    background: #f0f7ff;  /* ✅ Чуть светлее фон */
     border-radius: 14px;
     padding: 16px;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
     white-space: pre-wrap;
     margin-top: 12px;
     border-left: 4px solid #4a76a8;
+    color: #0a0a0a;  /* ✅ Почти чёрный текст для максимального контраста */
 }
 
 .result b {
-    color: #2c3e50;
+    color: #000000;  /* ✅ Абсолютно чёрный для заголовков */
+    font-weight: 700;
 }
 
 .result hr {
     margin: 12px 0;
     border: none;
-    border-top: 1px solid #cbd5e1;
+    border-top: 1px solid #a0b4c8;  /* ✅ Более тёмный разделитель */
 }
 
 .tabs {
@@ -145,7 +151,7 @@ button:active {
     font-weight: 500;
     cursor: pointer;
     transition: 0.2s;
-    color: #2c3e50;
+    color: #1a1a1a;  /* ✅ Контрастный цвет */
 }
 
 .tab.active {
@@ -159,7 +165,7 @@ button:active {
 
 small {
     font-size: 11px;
-    color: #6c757d;
+    color: #555555;  /* ✅ Чуть темнее */
     display: block;
     margin-top: 12px;
     text-align: center;
@@ -177,24 +183,58 @@ small {
     }
 }
 
+/* ✅ ✅ ✅ ИСПРАВЛЕНО: Тёмная тема с правильной контрастностью */
 @media (prefers-color-scheme: dark) {
     body {
-        background: #19191a;
+        background: #121212;  /* ✅ Более тёмный фон */
+        color: #f5f5f5;       /* ✅ Светлый текст */
     }
+    
     .card {
-        background: #222224;
+        background: #1e1e1e;
+        border: 1px solid #333;
     }
+    
+    label {
+        color: #f5f5f5;
+    }
+    
     input, select {
-        background: #2d2d2f;
-        border-color: #444446;
-        color: #e1e3e6;
+        background: #2a2a2a;
+        border-color: #444;
+        color: #ffffff;  /* ✅ Белый текст в полях */
     }
+    
+    input:focus, select:focus {
+        border-color: #6a8fc4;
+        box-shadow: 0 0 0 2px rgba(106, 143, 196, 0.3);
+    }
+    
     .result {
-        background: #2a3a5a;
+        background: #1a2a3a;  /* ✅ Тёмно-синий фон */
         border-left-color: #6a8fc4;
+        color: #ffffff;       /* ✅ Белый текст */
     }
+    
+    .result b {
+        color: #ffffff;       /* ✅ Белый жирный текст */
+    }
+    
+    .result hr {
+        border-top-color: #445566;
+    }
+    
     .tab {
-        background: #2d2d2f;
-        color: #e1e3e6;
+        background: #2a2a2a;
+        color: #e0e0e0;
+    }
+    
+    .tab.active {
+        background: #5c8db6;
+        color: #ffffff;
+    }
+    
+    small, .upload-status {
+        color: #aaaaaa;
     }
 }
