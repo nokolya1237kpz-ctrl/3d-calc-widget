@@ -2,7 +2,7 @@
  * 3D Print Cost Calculator — Frontend Application
  * VK Mini App with Flask backend integration
  * 
- * ✅ Added: Three.js 3D preview with grid, axes, screenshot (global scripts)
+ * ✅ Three.js 3D preview via global scripts (VK Mini Apps compatible)
  */
 
 // ============================================================================
@@ -20,24 +20,14 @@ let currentBlobUrl = null;
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async function() {
-    // Проверяем наличие vkBridge и инициализируем
+    // Инициализация VK Bridge
     if (typeof vkBridge !== 'undefined') {
         try {
             await vkBridge.send('VKWebAppInit');
-            console.log('✅ VK Bridge успешно инициализирован');
-            
-            vkBridge.send('VKWebAppGetClientVersion')
-                .then(function(data) {
-                    console.log('📱 VK App version:', data.platform, data.version);
-                })
-                .catch(function(e) {
-                    console.log('ℹ️ Не удалось получить версию клиента:', e);
-                });
+            console.log('✅ VK Bridge инициализирован');
         } catch (error) {
             console.warn('⚠️ Ошибка инициализации VK Bridge:', error);
         }
-    } else {
-        console.warn('⚠️ vkBridge не загружен — приложение запущено вне среды VK');
     }
     
     // ✅ Инициализация 3D Viewer
@@ -51,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // Запускаем основную инициализацию приложения
+    // Инициализация приложения
     initApp();
 });
 
@@ -259,10 +249,6 @@ function destroy3DViewer() {
 // КОНСТАНТЫ И КОНФИГУРАЦИЯ
 // ============================================================================
 
-/**
- * Цены материалов за килограмм (в рублях)
- * @type {Object<string, number>}
- */
 const MATERIAL_PRICES = {
     'PLA': 1200,
     'ABS': 1500,
@@ -271,20 +257,12 @@ const MATERIAL_PRICES = {
     'Nylon': 3000
 };
 
-/**
- * Коэффициенты сложности печати
- * @type {Object<string, number>}
- */
 const COMPLEXITY_MULTIPLIERS = {
     'low': 1.0,
     'medium': 1.3,
     'high': 1.7
 };
 
-/**
- * Ключи для хранения настроек в VK Storage
- * @type {string[]}
- */
 const STORAGE_KEYS = [
     'electricity_cost',
     'printer_power',
@@ -293,9 +271,6 @@ const STORAGE_KEYS = [
     'printing_rate'
 ];
 
-/**
- * Базовый URL API бэкенда
- */
 const API_BASE_URL = 'https://3dcalk.freedynamicdns.net:8443';
 
 // ============================================================================
