@@ -238,3 +238,48 @@ small {
         color: #aaaaaa;
     }
 }
+
+/* ============================================================================
+   3D PREVIEW & SCREENSHOT BUTTON
+   ============================================================================ */
+.btn-screenshot {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.05s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-screenshot:hover {
+    opacity: 0.95;
+}
+
+.btn-screenshot:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+.btn-screenshot:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Тёмная тема для превью */
+@media (prefers-color-scheme: dark) {
+    #preview-container {
+        background: #1a1a1a;
+    }
+    
+    .btn-screenshot {
+        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+    }
+}
