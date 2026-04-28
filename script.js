@@ -1,9 +1,19 @@
 /**
  * 3D Print Cost Calculator — Frontend Application
  * VK Mini App with Flask backend integration
+ * 
+ * ✅ Added: Three.js 3D preview with grid, axes, and screenshot
  */
 
-// ✅ Инициализация приложения после загрузки DOM и VK Bridge
+// ============================================================================
+// ИМПОРТЫ
+// ============================================================================
+import { STLViewer } from './stl-viewer.js';
+
+// ============================================================================
+// ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+// ============================================================================
+
 document.addEventListener('DOMContentLoaded', async function() {
     // Проверяем наличие vkBridge и инициализируем
     if (typeof vkBridge !== 'undefined') {
@@ -27,6 +37,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     } else {
         console.warn('⚠️ vkBridge не загружен — приложение запущено вне среды VK');
         console.log('💡 Для тестов откройте приложение через панель разработчика ВКонтакте');
+    }
+    
+    // ✅ Инициализация 3D Viewer
+    let viewer = null;
+    try {
+        viewer = new STLViewer('preview-container');
+        console.log('✅ 3D Viewer инициализирован');
+    } catch (e) {
+        console.warn('⚠️ 3D Viewer не инициализирован:', e);
+    }
+    
+    // ✅ Кнопка скриншота
+    const screenshotBtn = document.getElementById('screenshot-btn');
+    if (screenshotBtn && viewer) {
+        screenshotBtn.addEventListener('click', () => {
+            viewer.takeScreenshot();
+        });
     }
     
     // Запускаем основную инициализацию приложения
@@ -76,6 +103,29 @@ const STORAGE_KEYS = [
  * ✅ Используем HTTPS + домен + порт для корректной работы в VK
  */
 const API_BASE_URL = 'https://3dcalk.freedynamicdns.net:8443';
+
+// ============================================================================
+// DOM ЭЛЕМЕНТЫ
+// ============================================================================
+
+const elements = {
+    weight: document.getElementById('weight'),
+    material: document.getElementById('material'),
+    time: document.getElementById('time'),
+    complexity: document.getElementById('complexity'),
+    markup: document.getElementById('markup'),
+    calcBtn: document.getElementById('calc-btn'),
+    result: document.getElementById('result'),
+    uploadBtn: document.getElementById('upload-stl-btn'),
+    fileInput: document.getElementById('stl-file-input'),
+    uploadStatus: document.getElementById('upload-status'),
+    previewContainer: document.getElementById('preview-container'),
+    screenshotBtn: document.getElementById('screenshot-btn')
+};
+
+// Глобальные переменные
+let viewer = null;
+let currentBlobUrl = null;
 
 // ============================================================================
 // РАБОТА С VK STORAGE (через vkBridge)
@@ -214,28 +264,28 @@ function resetSettingsToDefault(showAlert) {
  */
 function calculateCost() {
     // Получаем и парсим входные данные от пользователя
-    const weight = parseFloat(document.getElementById('weight').value);
-    const material = document.getElementById('material').value;
-    const timeHours = parseFloat(document.getElementById('time').value);
-    const complexity = document.getElementById('complexity').value;
-    const markupPercent = parseFloat(document.getElementById('markup').value);
+    const weight = parseFloat(elements.weight?.value);
+    const material = elements.material?.value;
+    const timeHours = parseFloat(elements.time?.value);
+    const complexity = elements.complexity?.value;
+    const markupPercent = parseFloat(elements.markup?.value);
     
     // Валидация: проверяем корректность введённых данных
     if (isNaN(weight) || weight <= 0) {
         alert('⚠️ Пожалуйста, введите корректный вес модели (больше 0 грамм)');
-        document.getElementById('weight').focus();
+        elements.weight?.focus();
         return;
     }
     
     if (isNaN(timeHours) || timeHours <= 0) {
         alert('⚠️ Пожалуйста, введите корректное время печати (больше 0 часов)');
-        document.getElementById('time').focus();
+        elements.time?.focus();
         return;
     }
     
     if (isNaN(markupPercent) || markupPercent < 0) {
         alert('⚠️ Наценка должна быть неотрицательным числом');
-        document.getElementById('markup').focus();
+        elements.markup?.focus();
         return;
     }
     
@@ -317,15 +367,16 @@ function calculateCost() {
     ].join('\n');
     
     // Отображаем результат в интерфейсе
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = resultHTML;
-    resultDiv.classList.remove('hidden');
-    
-    // Плавная прокрутка к результату
-    resultDiv.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-    });
+    if (elements.result) {
+        elements.result.innerHTML = resultHTML;
+        elements.result.classList.remove('hidden');
+        
+        // Плавная прокрутка к результату
+        elements.result.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+    }
     
     // Логируем для отладки
     console.log('🧮 Расчёт завершён. Итоговая стоимость:', totalCost.toFixed(2), '₽');
@@ -337,6 +388,7 @@ function calculateCost() {
 
 /**
  * Загружает STL файл на сервер для автоматического определения объёма
+ * И отображает 3D-превью
  * @param {File} file - Файл STL для загрузки
  * @async
  * @returns {Promise<void>}
@@ -347,14 +399,35 @@ async function uploadSTL(file) {
     formData.append('stl_file', file);
     
     // Получаем элемент для отображения статуса
-    const statusDiv = document.getElementById('upload-status');
+    const statusDiv = elements.uploadStatus;
     
     // Показываем индикатор загрузки
-    statusDiv.textContent = '⏳ Отправка файла на сервер...';
-    statusDiv.style.color = '#6c757d';
+    if (statusDiv) {
+        statusDiv.textContent = '⏳ Отправка файла на сервер...';
+        statusDiv.style.color = '#6c757d';
+    }
+    
+    // ✅ Показываем 3D-превью контейнер
+    if (elements.previewContainer) {
+        elements.previewContainer.style.display = 'block';
+    }
+    if (elements.screenshotBtn) {
+        elements.screenshotBtn.style.display = 'block';
+        elements.screenshotBtn.disabled = true;
+        elements.screenshotBtn.textContent = '⏳ Рендеринг...';
+    }
     
     try {
-        // Отправляем POST-запрос с файлом на бэкенд
+        // ✅ Сначала рендерим локально (быстро, без ожидания сервера)
+        if (viewer) {
+            await viewer.loadFromBlob(file);
+            if (elements.screenshotBtn) {
+                elements.screenshotBtn.disabled = false;
+                elements.screenshotBtn.textContent = '📸 Сохранить скриншот';
+            }
+        }
+        
+        // Затем отправляем на сервер для расчёта объёма
         const response = await fetch(API_BASE_URL + '/api/volume', {
             method: 'POST',
             body: formData,
@@ -377,16 +450,22 @@ async function uploadSTL(file) {
         if (data.volume && typeof data.volume === 'number' && data.volume > 0) {
             // Подставляем рассчитанный объём (в см³) в поле веса
             // Пользователь может скорректировать с учётом плотности материала
-            document.getElementById('weight').value = data.volume.toFixed(2);
+            if (elements.weight) {
+                elements.weight.value = data.volume.toFixed(2);
+            }
             
-            statusDiv.textContent = '✅ Объём: ' + data.volume.toFixed(2) + ' см³. Значение подставлено в поле "Вес". Учтите плотность материала для точного расчёта веса.';
-            statusDiv.style.color = '#4caf50';
+            if (statusDiv) {
+                statusDiv.textContent = '✅ Объём: ' + data.volume.toFixed(2) + ' см³. Значение подставлено в поле "Вес". Учтите плотность материала для точного расчёта веса.';
+                statusDiv.style.color = '#4caf50';
+            }
             
             console.log('✅ STL обработан. Объём:', data.volume, 'см³');
         } else {
             // Объём не удалось вычислить
-            statusDiv.textContent = '❌ Не удалось вычислить объём. Проверьте корректность STL файла.';
-            statusDiv.style.color = '#f44336';
+            if (statusDiv) {
+                statusDiv.textContent = '❌ Не удалось вычислить объём. Проверьте корректность STL файла.';
+                statusDiv.style.color = '#f44336';
+            }
             console.warn('⚠️ API вернул невалидный объём:', data);
         }
         
@@ -395,16 +474,22 @@ async function uploadSTL(file) {
         console.error('❌ Ошибка загрузки STL:', error);
         
         // Показываем понятное сообщение пользователю
-        if (error.message && error.message.includes('Failed to fetch')) {
-            statusDiv.textContent = '❌ Ошибка соединения с сервером. Проверьте интернет-подключение и настройки CORS.';
-        } else if (error.message && error.message.includes('404')) {
-            statusDiv.textContent = '❌ Сервер не найден. Проверьте адрес API в настройках приложения.';
-        } else if (error.message && error.message.includes('413')) {
-            statusDiv.textContent = '❌ Файл слишком большой. Максимальный размер: 50 МБ.';
-        } else {
-            statusDiv.textContent = '❌ Ошибка: ' + (error.message || 'Неизвестная ошибка');
+        if (statusDiv) {
+            if (error.message && error.message.includes('Failed to fetch')) {
+                statusDiv.textContent = '❌ Ошибка соединения с сервером. Проверьте интернет-подключение и настройки CORS.';
+            } else if (error.message && error.message.includes('404')) {
+                statusDiv.textContent = '❌ Сервер не найден. Проверьте адрес API в настройках приложения.';
+            } else if (error.message && error.message.includes('413')) {
+                statusDiv.textContent = '❌ Файл слишком большой. Максимальный размер: 50 МБ.';
+            } else {
+                statusDiv.textContent = '❌ Ошибка: ' + (error.message || 'Неизвестная ошибка');
+            }
+            statusDiv.style.color = '#f44336';
         }
-        statusDiv.style.color = '#f44336';
+        
+        // Скрываем превью при ошибке
+        if (elements.previewContainer) elements.previewContainer.style.display = 'none';
+        if (elements.screenshotBtn) elements.screenshotBtn.style.display = 'none';
     }
 }
 
@@ -455,9 +540,8 @@ function initApp() {
     loadSettings();
     
     // 2. Настраиваем кнопку расчёта стоимости
-    const calcBtn = document.getElementById('calc-btn');
-    if (calcBtn) {
-        calcBtn.addEventListener('click', function(event) {
+    if (elements.calcBtn) {
+        elements.calcBtn.addEventListener('click', function(event) {
             event.preventDefault();
             calculateCost();
         });
@@ -483,18 +567,15 @@ function initApp() {
     }
     
     // 4. Настраиваем загрузку STL файлов
-    const uploadBtn = document.getElementById('upload-stl-btn');
-    const fileInput = document.getElementById('stl-file-input');
-    
-    if (uploadBtn && fileInput) {
+    if (elements.uploadBtn && elements.fileInput) {
         // Клик по кнопке → триггерим скрытый input
-        uploadBtn.addEventListener('click', function(event) {
+        elements.uploadBtn.addEventListener('click', function(event) {
             event.preventDefault();
-            fileInput.click();
+            elements.fileInput.click();
         });
         
         // Обработка выбора файла
-        fileInput.addEventListener('change', function(event) {
+        elements.fileInput.addEventListener('change', function(event) {
             const file = event.target.files && event.target.files[0];
             
             if (file) {
@@ -551,3 +632,26 @@ function initApp() {
     
     console.log('✅ Приложение 3D Calc полностью инициализировано');
 }
+
+// ============================================================================
+// ГЛОБАЛЬНЫЕ ОБРАБОТЧИКИ И ОЧИСТКА
+// ============================================================================
+
+window.addEventListener('error', function(event) {
+    console.error('🔴 Global error:', event.error);
+    if (elements.uploadStatus) {
+        elements.uploadStatus.textContent = '❌ Произошла ошибка в приложении';
+        elements.uploadStatus.className = 'upload-status';
+        elements.uploadStatus.style.color = '#f44336';
+    }
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('🔴 Unhandled promise rejection:', event.reason);
+});
+
+// ✅ Очистка при выгрузке страницы (предотвращает утечки памяти)
+window.addEventListener('beforeunload', () => {
+    if (viewer) viewer.destroy();
+    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+});
