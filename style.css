@@ -240,7 +240,7 @@ small {
 }
 
 /* ============================================================================
-   3D PREVIEW & SCREENSHOT BUTTON
+   3D PREVIEW & SCREENSHOT
    ============================================================================ */
 .btn-screenshot {
     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
@@ -258,28 +258,11 @@ small {
     gap: 8px;
 }
 
-.btn-screenshot:hover {
-    opacity: 0.95;
-}
+.btn-screenshot:hover { opacity: 0.95; }
+.btn-screenshot:active { transform: scale(0.98); opacity: 0.9; }
+.btn-screenshot:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-.btn-screenshot:active {
-    transform: scale(0.98);
-    opacity: 0.9;
-}
-
-.btn-screenshot:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Тёмная тема для превью */
 @media (prefers-color-scheme: dark) {
-    #preview-container {
-        background: #1a1a1a;
-    }
-    
-    .btn-screenshot {
-        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
-    }
+    #preview-container { background: #1a1a1a; }
+    .btn-screenshot { background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%); }
 }
