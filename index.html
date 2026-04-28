@@ -7,185 +7,98 @@
     <meta name="theme-color" content="#4a76a8">
     <title>3D Калькулятор печати</title>
     
-    <!-- Подключение стилей -->
+    <!-- Стили -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- ✅ VK Bridge — ОБЯЗАТЕЛЬНО перед вашим script.js -->
+    <!-- VK Bridge -->
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     
-    <!-- Иконка приложения (опционально) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖨️</text></svg>">
+    <!-- ✅ Three.js через глобальные CDN-скрипты (работает в VK Mini Apps) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.min.js"></script>
     
-    <!-- ✅ Three.js Import Map для 3D-просмотра -->
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
-    </script>
+    <!-- Иконка -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖨️</text></svg>">
 </head>
 <body>
-    <!-- Вкладки навигации -->
+    <!-- Вкладки -->
     <div class="tabs" role="tablist">
-        <div class="tab active" data-tab="calc" role="tab" aria-selected="true" tabindex="0">📊 Расчёт</div>
-        <div class="tab" data-tab="settings" role="tab" aria-selected="false" tabindex="0">⚙️ Настройки</div>
+        <div class="tab active" data-tab="calc" role="tab" aria-selected="true">📊 Расчёт</div>
+        <div class="tab" data-tab="settings" role="tab" aria-selected="false">⚙️ Настройки</div>
     </div>
 
-    <!-- Вкладка расчёта стоимости -->
-    <div id="calc-tab" class="card" role="tabpanel" aria-labelledby="calc-tab">
-        <!-- Вес модели -->
+    <!-- Вкладка расчёта -->
+    <div id="calc-tab" class="card" role="tabpanel">
         <label for="weight">⚖️ Вес модели (граммы)</label>
-        <input 
-            type="number" 
-            id="weight" 
-            placeholder="Например: 25" 
-            step="0.1" 
-            min="0"
-            aria-describedby="weight-hint"
-        >
-        <small id="weight-hint" style="color:#6c757d;margin-bottom:8px;display:block">Введите вес вручную или загрузите STL для автоопределения</small>
+        <input type="number" id="weight" placeholder="Например: 25" step="0.1" min="0">
+        <small style="color:#6c757d;margin-bottom:8px;display:block">Введите вес вручную или загрузите STL для автоопределения</small>
         
-        <!-- Загрузка STL файла -->
         <label>📁 Загрузить STL файл</label>
-        <input 
-            type="file" 
-            id="stl-file-input" 
-            accept=".stl" 
-            style="display:none"
-            aria-label="Выберите STL файл для загрузки"
-        >
-        <button 
-            id="upload-stl-btn" 
-            type="button"
-            style="margin-top:8px;background:#5c8db6"
-            aria-controls="upload-status"
-        >
-            📤 Выбрать файл STL
-        </button>
+        <input type="file" id="stl-file-input" accept=".stl" style="display:none">
+        <button id="upload-stl-btn" type="button" style="margin-top:8px;background:#5c8db6">📤 Выбрать файл STL</button>
         <div id="upload-status" class="upload-status" role="status" aria-live="polite"></div>
         
-        <!-- Выбор материала -->
         <label for="material">🧪 Материал</label>
-        <select id="material" aria-describedby="material-hint">
+        <select id="material">
             <option value="PLA">PLA (1200 ₽/кг, плотность 1.24 г/см³)</option>
             <option value="ABS">ABS (1500 ₽/кг, плотность 1.04 г/см³)</option>
             <option value="PETG">PETG (1100 ₽/кг, плотность 1.27 г/см³)</option>
             <option value="TPU">TPU (2200 ₽/кг, плотность 1.21 г/см³)</option>
             <option value="Nylon">Нейлон (3000 ₽/кг, плотность 1.14 г/см³)</option>
         </select>
-        <small id="material-hint" style="color:#6c757d;display:block;margin-top:4px">Плотность нужна для пересчёта объёма → вес</small>
         
-        <!-- Время печати -->
         <label for="time">⏱️ Время печати (часы)</label>
-        <input 
-            type="number" 
-            id="time" 
-            placeholder="Например: 3.5" 
-            step="0.1" 
-            min="0"
-        >
+        <input type="number" id="time" placeholder="Например: 3.5" step="0.1" min="0">
         
-        <!-- Сложность модели -->
         <label for="complexity">🔧 Сложность модели</label>
         <select id="complexity">
-            <option value="low">Простая (без поддержек) — коэффициент ×1.0</option>
-            <option value="medium">Средняя (с поддержками) — коэффициент ×1.3</option>
-            <option value="high">Сложная (техническая) — коэффициент ×1.7</option>
+            <option value="low">Простая (без поддержек) — ×1.0</option>
+            <option value="medium">Средняя (с поддержками) — ×1.3</option>
+            <option value="high">Сложная (техническая) — ×1.7</option>
         </select>
         
-        <!-- Наценка -->
         <label for="markup">📈 Наценка (%)</label>
-        <input 
-            type="number" 
-            id="markup" 
-            placeholder="Например: 30" 
-            value="30" 
-            min="0"
-            max="1000"
-        >
+        <input type="number" id="markup" placeholder="Например: 30" value="30" min="0" max="1000">
         
-        <!-- Кнопка расчёта -->
         <button id="calc-btn" type="button">🧮 Рассчитать стоимость</button>
         
-        <!-- ✅ 3D Preview Container -->
+        <!-- ✅ 3D Preview -->
         <div id="preview-container" style="width:100%; height:260px; border-radius:14px; overflow:hidden; display:none; margin:12px 0; background:#f4f6f8; touch-action:none;"></div>
         <button id="screenshot-btn" class="btn-screenshot" style="display:none; width:100%; margin-bottom:12px;">📸 Сохранить скриншот</button>
         
-        <!-- Блок результата -->
         <div id="result" class="result hidden" role="region" aria-live="polite"></div>
     </div>
 
     <!-- Вкладка настроек -->
-    <div id="settings-tab" class="card hidden" role="tabpanel" aria-labelledby="settings-tab">
-        <!-- Стоимость электроэнергии -->
+    <div id="settings-tab" class="card hidden" role="tabpanel">
         <label for="electricity_cost">⚡ Стоимость электроэнергии (₽/кВт·ч)</label>
-        <input 
-            type="number" 
-            id="electricity_cost" 
-            step="0.01" 
-            min="0"
-            value="5.85"
-            aria-describedby="electricity-hint"
-        >
-        <small id="electricity-hint" style="color:#6c757d;display:block;margin-bottom:8px">Укажите ваш тариф из квитанции</small>
+        <input type="number" id="electricity_cost" step="0.01" min="0" value="5.85">
         
-        <!-- Мощность принтера -->
         <label for="printer_power">🔌 Мощность принтера (Вт)</label>
-        <input 
-            type="number" 
-            id="printer_power" 
-            min="0"
-            value="200"
-        >
+        <input type="number" id="printer_power" min="0" value="200">
         
-        <!-- Стоимость принтера -->
         <label for="printer_cost">💰 Стоимость принтера (₽)</label>
-        <input 
-            type="number" 
-            id="printer_cost" 
-            min="0"
-            value="80000"
-        >
+        <input type="number" id="printer_cost" min="0" value="80000">
         
-        <!-- Срок службы -->
-        <label for="printer_lifetime">📅 Срок службы принтера (месяцы)</label>
-        <input 
-            type="number" 
-            id="printer_lifetime" 
-            min="1"
-            value="48"
-        >
+        <label for="printer_lifetime">📅 Срок службы (месяцы)</label>
+        <input type="number" id="printer_lifetime" min="1" value="48">
         
-        <!-- Ставка печати -->
         <label for="printing_rate">🕒 Ставка печати (₽/час)</label>
-        <input 
-            type="number" 
-            id="printing_rate" 
-            step="0.1"
-            min="0"
-            value="2"
-            aria-describedby="rate-hint"
-        >
-        <small id="rate-hint" style="color:#6c757d;display:block;margin-bottom:12px">Оплата за ваше время на подготовку и контроль печати</small>
+        <input type="number" id="printing_rate" step="0.1" min="0" value="2">
         
-        <!-- Кнопки действий -->
         <div class="inline-buttons">
-            <button id="save-settings" type="button" style="margin-top:18px;background:#4caf50">💾 Сохранить настройки</button>
-            <button id="reset-settings" type="button" style="margin-top:18px;background:#f44336">🔄 Сбросить</button>
+            <button id="save-settings" type="button" style="background:#4caf50">💾 Сохранить</button>
+            <button id="reset-settings" type="button" style="background:#f44336">🔄 Сброс</button>
         </div>
-        
-        <!-- Подсказка о сохранении -->
-        <small>✅ Настройки автоматически сохраняются в хранилище вашего аккаунта ВКонтакте</small>
+        <small>✅ Настройки сохраняются в аккаунте ВКонтакте</small>
     </div>
 
-    <!-- Подключение основного скрипта как модуля -->
-    <script type="module" src="script.js"></script>
+    <!-- Основной скрипт (НЕ module, чтобы работал в VK) -->
+    <script src="script.js"></script>
     
-    <!-- Аналитика и метрики (опционально) -->
+    <!-- Инициализация VK -->
     <script>
-        // Отправка события инициализации приложения (для аналитики)
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof vkBridge !== 'undefined') {
                 vkBridge.send('VKWebAppSetViewSettings', {
