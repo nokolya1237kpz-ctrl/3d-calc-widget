@@ -15,6 +15,16 @@
     
     <!-- Иконка приложения (опционально) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖨️</text></svg>">
+    
+    <!-- ✅ Three.js Import Map для 3D-просмотра -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
 </head>
 <body>
     <!-- Вкладки навигации -->
@@ -99,6 +109,10 @@
         <!-- Кнопка расчёта -->
         <button id="calc-btn" type="button">🧮 Рассчитать стоимость</button>
         
+        <!-- ✅ 3D Preview Container -->
+        <div id="preview-container" style="width:100%; height:260px; border-radius:14px; overflow:hidden; display:none; margin:12px 0; background:#f4f6f8; touch-action:none;"></div>
+        <button id="screenshot-btn" class="btn-screenshot" style="display:none; width:100%; margin-bottom:12px;">📸 Сохранить скриншот</button>
+        
         <!-- Блок результата -->
         <div id="result" class="result hidden" role="region" aria-live="polite"></div>
     </div>
@@ -166,8 +180,8 @@
         <small>✅ Настройки автоматически сохраняются в хранилище вашего аккаунта ВКонтакте</small>
     </div>
 
-    <!-- Подключение основного скрипта -->
-    <script src="script.js"></script>
+    <!-- Подключение основного скрипта как модуля -->
+    <script type="module" src="script.js"></script>
     
     <!-- Аналитика и метрики (опционально) -->
     <script>
