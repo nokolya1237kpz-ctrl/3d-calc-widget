@@ -2,7 +2,10 @@
  * 3D Print Cost Calculator — Frontend Application
  * VK Mini App with Flask backend integration
  * 
- * ✅ Fixed: Lazy 3D initialization (init only when container is visible)
+ * ✅ Fixed: 
+ * - Custom filament price input + calculation
+ * - Settings save via localStorage (fallback for VK Bridge)
+ * - Lazy 3D initialization
  */
 
 // ============================================================================
@@ -14,6 +17,37 @@ let viewerRenderer = null;
 let viewerControls = null;
 let viewerMesh = null;
 let viewerInitialized = false;
+
+// ============================================================================
+// КОНСТАНТЫ И КОНФИГУРАЦИЯ
+// ============================================================================
+
+// Плотности материалов (г/см³) — для пересчёта объёма в вес
+const MATERIAL_DENSITIES = {
+    'PLA': 1.24,
+    'ABS': 1.04,
+    'PETG': 1.27,
+    'TPU': 1.21,
+    'Nylon': 1.14
+};
+
+const COMPLEXITY_MULTIPLIERS = {
+    'low': 1.0,
+    'medium': 1.3,
+    'high': 1.7
+};
+
+// Ключи настроек для сохранения
+const STORAGE_KEYS = [
+    'electricity_cost',
+    'printer_power',
+    'printer_cost',
+    'printer_lifetime',
+    'printing_rate',
+    'filament_price'  // 👈 новое
+];
+
+const API_BASE_URL = 'https://3dcalk.freedynamicdns.net:8443';
 
 // ============================================================================
 // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
@@ -30,7 +64,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
     
-    // ✅ НЕ инициализируем 3D здесь! Ждём пока контейнер не станет видимым.
+    // Загружаем настройки (localStorage + VK Bridge fallback)
+    loadSettings();
     
     // Обработчик скриншота
     const screenshotBtn = document.getElementById('screenshot-btn');
@@ -352,109 +387,110 @@ function destroy3DViewer() {
 }
 
 // ============================================================================
-// КОНСТАНТЫ И КОНФИГУРАЦИЯ
+// РАБОТА С НАСТРОЙКАМИ (localStorage + VK Bridge fallback)
 // ============================================================================
 
-const MATERIAL_PRICES = {
-    'PLA': 1200,
-    'ABS': 1500,
-    'PETG': 1100,
-    'TPU': 2200,
-    'Nylon': 3000
-};
-
-const COMPLEXITY_MULTIPLIERS = {
-    'low': 1.0,
-    'medium': 1.3,
-    'high': 1.7
-};
-
-const STORAGE_KEYS = [
-    'electricity_cost',
-    'printer_power',
-    'printer_cost',
-    'printer_lifetime',
-    'printing_rate'
-];
-
-const API_BASE_URL = 'https://3dcalk.freedynamicdns.net:8443';
-
-// ============================================================================
-// РАБОТА С VK STORAGE
-// ============================================================================
-
-async function loadSettings() {
+function loadSettings() {
+    // 1. Сначала пробуем localStorage (работает всегда)
     try {
-        const response = await vkBridge.send('VKWebAppStorageGet', { 
-            keys: STORAGE_KEYS 
-        });
-        
-        const settings = {};
-        
-        if (response.keys && Array.isArray(response.keys)) {
-            response.keys.forEach(function(item) {
-                if (item.key && item.value !== undefined && item.value !== null) {
-                    const numericValue = parseFloat(item.value);
-                    if (!isNaN(numericValue)) {
-                        settings[item.key] = numericValue;
-                    }
+        const saved = localStorage.getItem('calc_settings');
+        if (saved) {
+            const settings = JSON.parse(saved);
+            applySettings(settings);
+            console.log('✅ Настройки загружены из localStorage');
+            return;
+        }
+    } catch (e) {
+        console.warn('⚠️ Не удалось загрузить из localStorage:', e);
+    }
+    
+    // 2. Если пусто — пробуем VK Bridge (опционально)
+    if (typeof vkBridge !== 'undefined') {
+        vkBridge.send('VKWebAppStorageGet', { keys: STORAGE_KEYS })
+            .then(function(response) {
+                const settings = {};
+                if (response.keys && Array.isArray(response.keys)) {
+                    response.keys.forEach(function(item) {
+                        if (item.key && item.value !== undefined && item.value !== null) {
+                            const numericValue = parseFloat(item.value);
+                            if (!isNaN(numericValue)) {
+                                settings[item.key] = numericValue;
+                            }
+                        }
+                    });
                 }
+                if (Object.keys(settings).length > 0) {
+                    applySettings(settings);
+                    // Сохраняем в localStorage для будущего
+                    localStorage.setItem('calc_settings', JSON.stringify(settings));
+                    console.log('✅ Настройки загружены из VK Storage');
+                }
+            })
+            .catch(function(error) {
+                console.warn('⚠️ Не удалось загрузить из VK Storage:', error);
+                resetSettingsToDefault(false);
             });
-        }
-        
-        if (settings.electricity_cost !== undefined) {
-            document.getElementById('electricity_cost').value = settings.electricity_cost;
-        }
-        if (settings.printer_power !== undefined) {
-            document.getElementById('printer_power').value = settings.printer_power;
-        }
-        if (settings.printer_cost !== undefined) {
-            document.getElementById('printer_cost').value = settings.printer_cost;
-        }
-        if (settings.printer_lifetime !== undefined) {
-            document.getElementById('printer_lifetime').value = settings.printer_lifetime;
-        }
-        if (settings.printing_rate !== undefined) {
-            document.getElementById('printing_rate').value = settings.printing_rate;
-        }
-        
-        console.log('✅ Настройки загружены из VK Storage:', settings);
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки настроек из VK Storage:', error);
+    } else {
         resetSettingsToDefault(false);
     }
 }
 
-async function saveSettingsToStorage() {
+function applySettings(settings) {
+    if (settings.electricity_cost !== undefined) {
+        document.getElementById('electricity_cost').value = settings.electricity_cost;
+    }
+    if (settings.printer_power !== undefined) {
+        document.getElementById('printer_power').value = settings.printer_power;
+    }
+    if (settings.printer_cost !== undefined) {
+        document.getElementById('printer_cost').value = settings.printer_cost;
+    }
+    if (settings.printer_lifetime !== undefined) {
+        document.getElementById('printer_lifetime').value = settings.printer_lifetime;
+    }
+    if (settings.printing_rate !== undefined) {
+        document.getElementById('printing_rate').value = settings.printing_rate;
+    }
+    if (settings.filament_price !== undefined) {
+        document.getElementById('filament_price').value = settings.filament_price;
+    }
+}
+
+function saveSettings() {
     const settings = {
-        electricity_cost: document.getElementById('electricity_cost').value,
-        printer_power: document.getElementById('printer_power').value,
-        printer_cost: document.getElementById('printer_cost').value,
-        printer_lifetime: document.getElementById('printer_lifetime').value,
-        printing_rate: document.getElementById('printing_rate').value
+        electricity_cost: parseFloat(document.getElementById('electricity_cost').value) || 5.85,
+        printer_power: parseFloat(document.getElementById('printer_power').value) || 200,
+        printer_cost: parseFloat(document.getElementById('printer_cost').value) || 80000,
+        printer_lifetime: parseFloat(document.getElementById('printer_lifetime').value) || 48,
+        printing_rate: parseFloat(document.getElementById('printing_rate').value) || 2,
+        filament_price: parseFloat(document.getElementById('filament_price').value) || 1500
     };
     
-    const updates = Object.entries(settings).map(function(entry) {
-        const key = entry[0];
-        const value = entry[1];
-        return { 
-            key: key, 
-            value: String(value)
-        };
-    });
-    
+    // 1. Сохраняем в localStorage (гарантированно работает)
     try {
-        await vkBridge.send('VKWebAppStorageSet', { 
-            updates: updates 
+        localStorage.setItem('calc_settings', JSON.stringify(settings));
+        console.log('✅ Настройки сохранены в localStorage');
+    } catch (e) {
+        console.error('❌ Ошибка сохранения в localStorage:', e);
+    }
+    
+    // 2. Пытаемся сохранить в VK Bridge (опционально)
+    if (typeof vkBridge !== 'undefined') {
+        const updates = Object.entries(settings).map(function(entry) {
+            return { key: entry[0], value: String(entry[1]) };
         });
         
-        alert('✅ Настройки успешно сохранены в вашем аккаунте ВКонтакте!');
-        console.log('✅ Настройки сохранены в VK Storage:', settings);
-        
-    } catch (error) {
-        alert('❌ Не удалось сохранить настройки. Проверьте подключение к интернету.');
-        console.error('❌ Ошибка VKWebAppStorageSet:', error);
+        vkBridge.send('VKWebAppStorageSet', { updates: updates })
+            .then(function() {
+                console.log('✅ Настройки также сохранены в VK Storage');
+                alert('✅ Настройки сохранены!');
+            })
+            .catch(function(error) {
+                console.warn('⚠️ Не удалось сохранить в VK Storage (но в браузере — ОК):', error);
+                alert('✅ Настройки сохранены локально!');
+            });
+    } else {
+        alert('✅ Настройки сохранены!');
     }
 }
 
@@ -464,22 +500,19 @@ function resetSettingsToDefault(showAlert) {
         printer_power: 200,
         printer_cost: 80000,
         printer_lifetime: 48,
-        printing_rate: 2
+        printing_rate: 2,
+        filament_price: 1500
     };
     
-    document.getElementById('electricity_cost').value = defaults.electricity_cost;
-    document.getElementById('printer_power').value = defaults.printer_power;
-    document.getElementById('printer_cost').value = defaults.printer_cost;
-    document.getElementById('printer_lifetime').value = defaults.printer_lifetime;
-    document.getElementById('printing_rate').value = defaults.printing_rate;
+    applySettings(defaults);
     
     if (showAlert !== false) {
-        saveSettingsToStorage();
+        saveSettings();
     }
 }
 
 // ============================================================================
-// РАСЧЁТ СТОИМОСТИ ПЕЧАТИ
+// РАСЧЁТ СТОИМОСТИ ПЕЧАТИ (с кастомной ценой пластика)
 // ============================================================================
 
 function calculateCost() {
@@ -507,29 +540,38 @@ function calculateCost() {
         return;
     }
     
+    // Загружаем настройки
     const electricityCost = parseFloat(document.getElementById('electricity_cost').value) || 5.85;
     const printerPower = parseFloat(document.getElementById('printer_power').value) || 200;
     const printerCost = parseFloat(document.getElementById('printer_cost').value) || 80000;
     const printerLifetimeMonths = parseFloat(document.getElementById('printer_lifetime').value) || 48;
     const printingRate = parseFloat(document.getElementById('printing_rate').value) || 2;
     
-    const plasticPricePerKg = MATERIAL_PRICES[material];
-    const plasticCost = (weight / 1000) * plasticPricePerKg;
+    // ✅ НОВОЕ: цена пластика из настроек (а не из хардкода)
+    const customFilamentPrice = parseFloat(document.getElementById('filament_price').value) || 1500;
     
+    // Расчёт стоимости пластика: вес (г) / 1000 * цена (₽/кг)
+    const plasticCost = (weight / 1000) * customFilamentPrice;
+    
+    // Электричество
     const printerPowerKw = printerPower / 1000;
     const electricityTotal = printerPowerKw * timeHours * electricityCost;
     
+    // Амортизация принтера
     const hoursPerMonth = 8 * 30;
     const totalLifetimeHours = printerLifetimeMonths * hoursPerMonth;
     const amortizationPerHour = printerCost / totalLifetimeHours;
     const amortizationCost = amortizationPerHour * timeHours;
     
+    // Трудозатраты
     const laborCost = timeHours * printingRate;
     
+    // Сложность
     const complexityMultiplier = COMPLEXITY_MULTIPLIERS[complexity];
     const baseCost = plasticCost + electricityTotal + amortizationCost + laborCost;
     const complexityCost = baseCost * (complexityMultiplier - 1);
     
+    // Итог
     const costPrice = baseCost + complexityCost;
     const markupAmount = costPrice * (markupPercent / 100);
     const totalCost = costPrice + markupAmount;
@@ -551,7 +593,7 @@ function calculateCost() {
         '• Наценка: ' + markupPercent + '%',
         '<hr>',
         '<b>⚙️ Детализация расходов:</b>',
-        '• Пластик: ' + plasticCost.toFixed(1) + ' ₽',
+        '• Пластик: ' + plasticCost.toFixed(1) + ' ₽ <small>(по цене ' + customFilamentPrice + ' ₽/кг)</small>',
         '• Электричество: ' + electricityTotal.toFixed(1) + ' ₽',
         '• Амортизация принтера: ' + amortizationCost.toFixed(1) + ' ₽',
         '• Трудозатраты оператора: ' + laborCost.toFixed(1) + ' ₽',
@@ -643,14 +685,19 @@ async function uploadSTL(file) {
         const data = await response.json();
         
         if (data.volume && typeof data.volume === 'number' && data.volume > 0) {
-            document.getElementById('weight').value = data.volume.toFixed(2);
+            // ✅ Конвертируем объём (см³) в вес (г) с учётом плотности материала
+            const material = document.getElementById('material').value;
+            const density = MATERIAL_DENSITIES[material] || 1.24; // PLA по умолчанию
+            const weightGrams = data.volume * density;
+            
+            document.getElementById('weight').value = weightGrams.toFixed(2);
             
             if (statusDiv) {
-                statusDiv.textContent = '✅ Объём: ' + data.volume.toFixed(2) + ' см³. Значение подставлено в поле "Вес". Учтите плотность материала для точного расчёта веса.';
+                statusDiv.textContent = '✅ Объём: ' + data.volume.toFixed(2) + ' см³ → Вес: ' + weightGrams.toFixed(2) + ' г (' + material + ', плотность ' + density + ' г/см³). Значение подставлено в поле "Вес".';
                 statusDiv.style.color = '#4caf50';
             }
             
-            console.log('✅ STL обработан. Объём:', data.volume, 'см³');
+            console.log('✅ STL обработан. Объём:', data.volume, 'см³ → Вес:', weightGrams.toFixed(2), 'г');
         } else {
             if (statusDiv) {
                 statusDiv.textContent = '❌ Не удалось вычислить объём. Проверьте корректность STL файла.';
@@ -712,7 +759,7 @@ function switchTab(tabId) {
 function initApp() {
     console.log('🚀 Инициализация приложения 3D Calc...');
     
-    loadSettings();
+    // Настройки уже загружены в DOMContentLoaded
     
     const calcBtn = document.getElementById('calc-btn');
     if (calcBtn) {
@@ -726,7 +773,7 @@ function initApp() {
     if (saveBtn) {
         saveBtn.addEventListener('click', function(event) {
             event.preventDefault();
-            saveSettingsToStorage();
+            saveSettings();
         });
     }
     
