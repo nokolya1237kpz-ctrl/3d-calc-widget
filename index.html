@@ -41,11 +41,11 @@
         
         <label for="material">🧪 Материал</label>
         <select id="material">
-            <option value="PLA">PLA (1200 ₽/кг, плотность 1.24 г/см³)</option>
-            <option value="ABS">ABS (1500 ₽/кг, плотность 1.04 г/см³)</option>
-            <option value="PETG">PETG (1100 ₽/кг, плотность 1.27 г/см³)</option>
-            <option value="TPU">TPU (2200 ₽/кг, плотность 1.21 г/см³)</option>
-            <option value="Nylon">Нейлон (3000 ₽/кг, плотность 1.14 г/см³)</option>
+            <option value="PLA">PLA (плотность 1.24 г/см³)</option>
+            <option value="ABS">ABS (плотность 1.04 г/см³)</option>
+            <option value="PETG">PETG (плотность 1.27 г/см³)</option>
+            <option value="TPU">TPU (плотность 1.21 г/см³)</option>
+            <option value="Nylon">Нейлон (плотность 1.14 г/см³)</option>
         </select>
         
         <label for="time">⏱️ Время печати (часы)</label>
@@ -87,11 +87,16 @@
         <label for="printing_rate">🕒 Ставка печати (₽/час)</label>
         <input type="number" id="printing_rate" step="0.1" min="0" value="2">
         
+        <!-- ✅ НОВОЕ: Цена пластика -->
+        <label for="filament_price">🧵 Цена пластика (₽/кг)</label>
+        <input type="number" id="filament_price" step="10" min="100" value="1500" placeholder="Например: 1500">
+        <small style="color:#666; display:block; margin-top:4px;">Укажите актуальную цену вашего пластика. По умолчанию: 1500 ₽/кг</small>
+        
         <div class="inline-buttons">
             <button id="save-settings" type="button" style="background:#4caf50">💾 Сохранить</button>
             <button id="reset-settings" type="button" style="background:#f44336">🔄 Сброс</button>
         </div>
-        <small>✅ Настройки сохраняются в аккаунте ВКонтакте</small>
+        <small>✅ Настройки сохраняются локально в браузере</small>
     </div>
 
     <!-- Основной скрипт (НЕ module, чтобы работал в VK) -->
